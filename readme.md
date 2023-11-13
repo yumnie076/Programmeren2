@@ -1,1 +1,1 @@
-ik ben salim en dit is ons codeacacademy project
+Hallo, wij zijn Yumnie, Salim en Kayleigh. Wij vormen samen groep 7 voor project Codecademy.
