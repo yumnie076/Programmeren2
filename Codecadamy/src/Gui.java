@@ -41,7 +41,7 @@ public class Gui extends Application {
 
         // Titel bovenaan de pagina
         Text title = new Text("Welkom op de Homepagina");
-        title.setFont(Font.font("Verdana", FontWeight.BOLD, 14));
+        title.setFont(Font.font("Verdana", FontWeight.BOLD, 30));
 
         // Maak een HBox voor het opmaken van de titel
         HBox titleBox = new HBox();
@@ -67,7 +67,7 @@ public class Gui extends Application {
         vbox.getChildren().addAll(titleBox, buttonBox);
 
         // Maak een Scene en toon het venster
-        Scene scene = new Scene(vbox, 300, 200);
+        Scene scene = new Scene(vbox, 700, 700);
         primaryStage.setScene(scene);
         primaryStage.show();
     }
@@ -87,9 +87,9 @@ public class Gui extends Application {
         titleBox.setPadding(new Insets(10, 10, 10, 10));
 
         // Maak een VBox voor het opmaken van de knoppen
-        VBox vbox = new VBox(10); // 10 is de verticale ruimte tussen knoppen
-        vbox.setPadding(new Insets(10, 10, 10, 10));
-        vbox.setAlignment(javafx.geometry.Pos.CENTER); // Knoppen in het midden van de pagina
+        HBox HBox = new HBox(10); // 10 is de verticale ruimte tussen knoppen
+        HBox.setPadding(new Insets(10, 10, 10, 10));
+        HBox.setAlignment(javafx.geometry.Pos.CENTER); // Knoppen in het midden van de pagina
 
         // Voeg knoppen toe aan de VBox
         Button backButton = new Button("Terug naar Homepagina");
@@ -100,10 +100,10 @@ public class Gui extends Application {
             openHomeVenster();
         });
 
-        vbox.getChildren().addAll(titleBox, backButton);
+        HBox.getChildren().addAll(titleBox, backButton);
 
         // Maak een Scene en toon het venster
-        Scene scene = new Scene(vbox, 300, 200);
+        Scene scene = new Scene(HBox, 300, 200);
         cursusStage.setScene(scene);
         cursusStage.show();
     }
@@ -141,7 +141,7 @@ public class Gui extends Application {
         cursisten = FXCollections.observableArrayList(getCursistenFromDatabase());
         cursistenListView.setItems(cursisten);
 
-        vbox.getChildren().addAll(titleBox, addButton, deleteButton, updateButton, cursistenListView);
+        vbox.getChildren().addAll(titleBox, cursistenListView, addButton, deleteButton, updateButton);
 
         // Maak een Scene en toon het venster
         Scene scene = new Scene(vbox, 500, 500);
