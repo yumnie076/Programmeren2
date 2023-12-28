@@ -33,11 +33,13 @@ public class Gui extends Application {
 
         // Voeg knoppen toe aan de HBox
         Button buttonCursist = new Button("Cursist");
+        Button buttonOverview = new Button("Overview pages");
 
         // Voeg knopfunctionaliteit toe
         buttonCursist.setOnAction(e -> Cursist.openCursistVenster());
+        buttonOverview.setOnAction(e -> Overview.openOverviewPage());
 
-        buttonBox.getChildren().addAll(buttonCursist);
+        buttonBox.getChildren().addAll(buttonCursist, buttonOverview);
 
         // Maak een VBox voor het opmaken van de gehele pagina
         VBox vbox = new VBox(10); // 10 is de verticale ruimte tussen titel en knoppen
