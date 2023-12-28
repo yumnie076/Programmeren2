@@ -88,10 +88,9 @@ public class Cursist {
     private static List<String> getCursistenFromDatabase() {
         List<String> cursisten = new ArrayList<>();
 
-        // JDBC URL, gebruikersnaam en wachtwoord van de SQL Server-database
-        String url = "jdbc:sqlserver://localhost;databaseName=CodeAcadamyGroup;encrypt=true;trustServerCertificate=true;";
-        String gebruikersnaam = "salim";
-        String wachtwoord = "salim";
+        String url = databaseConnect.getUrl();
+        String gebruikersnaam = databaseConnect.GetPass();
+        String wachtwoord = databaseConnect.GetPass();
 
         // SQL-query om gegevens op te halen
         String query = "SELECT naam,Email FROM Cursist";
@@ -153,9 +152,10 @@ public class Cursist {
 
     private static void deleteCursistFromDatabase(String cursistEmail) {
         // JDBC URL, gebruikersnaam en wachtwoord van de SQL Server-database
-        String url = "jdbc:sqlserver://localhost;databaseName=CodeAcadamyGroup;encrypt=true;trustServerCertificate=true;";
-        String gebruikersnaam = "salim";
-        String wachtwoord = "salim";
+
+        String url = databaseConnect.getUrl();
+        String gebruikersnaam = databaseConnect.GetPass();
+        String wachtwoord = databaseConnect.GetPass();
 
         // SQL-query om de cursist te verwijderen
         String query = "DELETE FROM Cursist WHERE email = ?";
@@ -354,10 +354,10 @@ public class Cursist {
     private static void populateUpdateForm(String selectedCursist, TextField nameField, TextField emailField,
             ChoiceBox<String> genderChoiceBox, TextField dobField, TextField addressField,
             TextField cityField, TextField countryField) {
-        // JDBC URL, gebruikersnaam en wachtwoord van de SQL Server-database
-        String url = "jdbc:sqlserver://localhost;databaseName=CodeAcadamyGroup;encrypt=true;trustServerCertificate=true;";
-        String gebruikersnaam = "salim";
-        String wachtwoord = "salim";
+
+        String url = databaseConnect.getUrl();
+        String gebruikersnaam = databaseConnect.GetPass();
+        String wachtwoord = databaseConnect.GetPass();
 
         // SQL-query om gegevens op te halen voor de geselecteerde cursist
         String query = "SELECT * FROM Cursist WHERE email = ?";
@@ -403,10 +403,10 @@ public class Cursist {
 
     private static void updateCursist(String selectedCursist, String name, String email, String gender, String dob,
             String address, String city, String country) {
-        // JDBC URL, gebruikersnaam en wachtwoord van de SQL Server-database
-        String url = "jdbc:sqlserver://localhost;databaseName=CodeAcadamyGroup;encrypt=true;trustServerCertificate=true;";
-        String gebruikersnaam = "salim";
-        String wachtwoord = "salim";
+
+        String url = databaseConnect.getUrl();
+        String gebruikersnaam = databaseConnect.GetPass();
+        String wachtwoord = databaseConnect.GetPass();
 
         // SQL-query om gegevens bij te werken
         String query = "UPDATE Cursist SET Naam = ?, Email = ?, Geslacht = ?, Geboortedatum = ?, Adres = ?, Woonplaats = ?, Land = ? WHERE email = ?";
@@ -444,10 +444,10 @@ public class Cursist {
 
     private static void submitCursistForm(String name, String email, String gender, Date dob,
             String address, String city, String country) {
-        // JDBC URL, gebruikersnaam en wachtwoord van de SQL Server-database
-        String url = "jdbc:sqlserver://localhost;databaseName=CodeAcadamyGroup; encrypt=true;trustServerCertificate=true;";
-        String gebruikersnaam = "salim";
-        String wachtwoord = "salim";
+
+        String url = databaseConnect.getUrl();
+        String gebruikersnaam = databaseConnect.GetPass();
+        String wachtwoord = databaseConnect.GetPass();
 
         // SQL-query om gegevens in te voegen
         String query = "INSERT INTO Cursist (Naam, Email, Geslacht, Geboortedatum, Adres, Woonplaats, Land) " +

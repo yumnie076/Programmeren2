@@ -48,49 +48,4 @@ public class Gui extends Application {
         primaryStage.setScene(scene);
         primaryStage.show();
     }
-
-    private void openCursusVenster() {
-        Stage cursusStage = new Stage();
-        cursusStage.setTitle("Cursuspagina");
-
-        // Titel bovenaan de pagina
-        Text title = new Text("Welkom op de Cursus pagina");
-        title.setFont(Font.font("Verdana", FontWeight.BOLD, 14));
-
-        // Maak een HBox voor het opmaken van de titel
-        HBox titleBox = new HBox();
-        titleBox.getChildren().add(title);
-        titleBox.setAlignment(javafx.geometry.Pos.TOP_CENTER);
-        titleBox.setPadding(new Insets(10, 10, 10, 10));
-
-        // Maak een VBox voor het opmaken van de knoppen
-        HBox HBox = new HBox(10); // 10 is de verticale ruimte tussen knoppen
-        HBox.setPadding(new Insets(10, 10, 10, 10));
-        HBox.setAlignment(javafx.geometry.Pos.CENTER); // Knoppen in het midden van de pagina
-
-        // Voeg knoppen toe aan de VBox
-        Button backButton = new Button("Terug naar Homepagina");
-
-        // Voeg knopfunctionaliteit toe
-        backButton.setOnAction(e -> {
-            cursusStage.close();
-            openHomeVenster();
-        });
-
-        HBox.getChildren().addAll(titleBox, backButton);
-
-        // Maak een Scene en toon het venster
-        Scene scene = new Scene(HBox, 300, 200);
-        cursusStage.setScene(scene);
-        cursusStage.show();
-    }
-
-    private static void openHomeVenster() {
-        Stage homeStage = new Stage();
-        homeStage.setTitle("Homepagina");
-
-        // Maak een HomePage-object en roep de start-methode aan
-        Gui homePage = new Gui();
-        homePage.start(homeStage);
-    }
 }
