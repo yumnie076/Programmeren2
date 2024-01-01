@@ -121,7 +121,11 @@ public class Cursist {
         TableColumn<Cursist, String> geslachtColumn = new TableColumn<>("Geslacht");
         geslachtColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getGeslacht()));
 
-        cursistenTableView.getColumns().addAll(Arrays.asList(naamColumn, emailColumn, geslachtColumn));
+        TableColumn<Cursist, String> woonpTableColumn = new TableColumn<>("woonplaats");
+        woonpTableColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getWoonplaats()));
+
+        cursistenTableView.getColumns()
+                .addAll(Arrays.asList(naamColumn, emailColumn, geslachtColumn, woonpTableColumn));
 
         // Populate data for the TableView
         cursistenTableView.refresh();
