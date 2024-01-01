@@ -5,6 +5,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -28,15 +30,17 @@ import javafx.scene.control.TableColumn;
 public class Inschrijving {
 
     private static ComboBox<String> cursistComboBox = new ComboBox<>();
-    private static ComboBox<Integer> cursusComboBox = new ComboBox<>();
+    private static ComboBox<String> cursusComboBox = new ComboBox<>();
+    private static Map<String, Integer> cursusIdMap = new HashMap<>();
+    private static TableView<InschrijvingDetail> inschrijvingenTable;
+    private static ObservableList<InschrijvingDetail> data = FXCollections.observableArrayList();
 
     public static void openInschrijvingenVenster() {
         Stage overzichtStage = new Stage();
         overzichtStage.setTitle("Inschrijvingen Overzicht");
 
         // Tabel voor inschrijvingen
-        TableView<InschrijvingDetail> table = new TableView<>();
-        ObservableList<InschrijvingDetail> data = haalInschrijvingenOp();
+        inschrijvingenTable = new TableView<>();
 
         // Kolommen voor tabel
         TableColumn<InschrijvingDetail, String> cursistCol = new TableColumn<>("Cursist Email");
@@ -46,18 +50,20 @@ public class Inschrijving {
         TableColumn<InschrijvingDetail, String> datumCol = new TableColumn<>("Inschrijf Datum");
         datumCol.setCellValueFactory(new PropertyValueFactory<>("inschrijfDatum"));
 
-        table.getColumns()
+        inschrijvingenTable.getColumns()
                 .addAll(Arrays.asList(cursistCol, cursusCol, datumCol));
-        table.setItems(data);
+        inschrijvingenTable.refresh();
+        data.setAll(haalInschrijvingenOp());
+        inschrijvingenTable.setItems(data);
 
         Button addButton = new Button("Maak inschrijving aan");
         addButton.setOnAction(e -> openInschrijvingsFormulier());
 
         Button verwijderKnop = new Button("Verwijder Inschrijving");
-        verwijderKnop.setOnAction(e -> verwijderGeselecteerdeInschrijving(table));
+        verwijderKnop.setOnAction(e -> verwijderGeselecteerdeInschrijving(inschrijvingenTable));
 
         VBox vbox = new VBox(10);
-        vbox.getChildren().addAll(table, addButton, verwijderKnop);
+        vbox.getChildren().addAll(inschrijvingenTable, addButton, verwijderKnop);
         vbox.setPadding(new Insets(10));
 
         Scene scene = new Scene(vbox, 500, 500);
@@ -87,10 +93,10 @@ public class Inschrijving {
         Button inschrijfButton = new Button("Inschrijven");
         inschrijfButton.setOnAction(e -> {
             String geselecteerdeCursistEmail = cursistComboBox.getValue();
-            Integer geselecteerdeCursusId = cursusComboBox.getValue();
+            String geselecteerdeCursusId = cursusComboBox.getValue();
             LocalDate inschrijfDatum = datePicker.getValue();
             if (geselecteerdeCursistEmail != null && geselecteerdeCursusId != null && inschrijfDatum != null) {
-                inschrijvenCursist(geselecteerdeCursistEmail, geselecteerdeCursusId, inschrijfDatum);
+                inschrijvenCursist(geselecteerdeCursistEmail, inschrijfDatum);
 
                 inschrijvingsStage.close();
             }
@@ -138,36 +144,43 @@ public class Inschrijving {
         String gebruikersnaam = databaseConnect.getGebruikersnaam();
         String wachtwoord = databaseConnect.GetPass();
 
-        String query = "SELECT CursusID FROM Cursus";
+        String query = "SELECT CursusID, CursusNaam FROM Cursus";
 
         try (Connection connection = DriverManager.getConnection(url, gebruikersnaam, wachtwoord);
                 PreparedStatement preparedStatement = connection.prepareStatement(query);
                 ResultSet resultSet = preparedStatement.executeQuery()) {
 
-            ObservableList<Integer> cursussen = FXCollections.observableArrayList();
+            ObservableList<String> cursussen = FXCollections.observableArrayList();
             while (resultSet.next()) {
-                cursussen.add(resultSet.getInt("CursusID"));
+                int cursusId = resultSet.getInt("CursusID");
+                String cursusNaam = resultSet.getString("CursusNaam");
+                cursussen.add(cursusNaam);
+
+                // Map cursusNaam to cursusId
+                cursusIdMap.put(cursusNaam, cursusId);
             }
             cursusComboBox.setItems(cursussen);
         } catch (SQLException e) {
             e.printStackTrace();
-
         }
     }
 
-    public static void inschrijvenCursist(String cursistEmail, int cursusId, LocalDate inschrijfDatum) {
+    public static void inschrijvenCursist(String cursistEmail, LocalDate inschrijfDatum) {
         String url = databaseConnect.getUrl();
         String gebruikersnaam = databaseConnect.getGebruikersnaam();
         String wachtwoord = databaseConnect.GetPass();
 
         try (Connection connection = DriverManager.getConnection(url, gebruikersnaam, wachtwoord)) {
 
+            // Haal het cursusId op van de geselecteerde cursusNaam in de ComboBox
+            int geselecteerdeCursusId = cursusIdMap.get(cursusComboBox.getValue());
+
             String query = "INSERT INTO Inschrijving (CursistEmail, CursusID, InschrijfDatum) VALUES (?, ?, ?)";
 
-            try (PreparedStatement preparedStatement = connection.prepareStatement(query)) { // De nieuwe InschrijvingId
-                preparedStatement.setString(1, cursistEmail); // E-mailadres van de cursist
-                preparedStatement.setInt(2, cursusId); // ID van de cursus
-                preparedStatement.setDate(3, java.sql.Date.valueOf(inschrijfDatum)); // De inschrijfdatum
+            try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+                preparedStatement.setString(1, cursistEmail);
+                preparedStatement.setInt(2, geselecteerdeCursusId);
+                preparedStatement.setDate(3, java.sql.Date.valueOf(inschrijfDatum));
 
                 int affectedRows = preparedStatement.executeUpdate();
                 if (affectedRows > 0) {
@@ -231,6 +244,7 @@ public class Inschrijving {
                 // parameters neemt.
                 InschrijvingDetail inschrijving = new InschrijvingDetail(cursistId, cursusId, inschrijfDatum);
                 inschrijvingen.add(inschrijving);
+                inschrijvingenTable.refresh();
             }
         } catch (SQLException e) {
             e.printStackTrace();
