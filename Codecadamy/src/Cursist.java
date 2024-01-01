@@ -139,8 +139,8 @@ public class Cursist {
     private static List<Cursist> getCursistenFromDatabase() {
         List<Cursist> cursisten = new ArrayList<>();
 
-        String url = databaseConnect.getUrl();
-        String gebruikersnaam = databaseConnect.GetPass();
+          String url = databaseConnect.getUrl();
+        String gebruikersnaam = databaseConnect.getGebruikersnaam();
         String wachtwoord = databaseConnect.GetPass();
 
         // SQL-query om gegevens op te halen
@@ -215,7 +215,7 @@ public class Cursist {
         // JDBC URL, gebruikersnaam en wachtwoord van de SQL Server-database
 
         String url = databaseConnect.getUrl();
-        String gebruikersnaam = databaseConnect.GetPass();
+        String gebruikersnaam = databaseConnect.getGebruikersnaam();
         String wachtwoord = databaseConnect.GetPass();
 
         // SQL-query om de cursist te verwijderen
@@ -468,8 +468,8 @@ public class Cursist {
             LocalDate localDate,
             String address, String city, String country) {
 
-        String url = databaseConnect.getUrl();
-        String gebruikersnaam = databaseConnect.GetPass();
+           String url = databaseConnect.getUrl();
+        String gebruikersnaam = databaseConnect.getGebruikersnaam();
         String wachtwoord = databaseConnect.GetPass();
 
         // SQL-query om gegevens bij te werken
@@ -509,8 +509,8 @@ public class Cursist {
     private static void submitCursistForm(String name, String email, String gender, Date dob,
             String address, String city, String country) {
 
-        String url = databaseConnect.getUrl();
-        String gebruikersnaam = databaseConnect.GetPass();
+           String url = databaseConnect.getUrl();
+        String gebruikersnaam = databaseConnect.getGebruikersnaam();
         String wachtwoord = databaseConnect.GetPass();
 
         // SQL-query om gegevens in te voegen
