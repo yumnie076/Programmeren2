@@ -79,7 +79,7 @@ public class Overview {
 
         vbox.getChildren().addAll(titleBox);
         String url = databaseConnect.getUrl();
-        String gebruikersnaam = databaseConnect.GetPass();
+        String gebruikersnaam = databaseConnect.getGebruikersnaam();
         String wachtwoord = databaseConnect.GetPass();
 
         String query = "SELECT TOP 3 W.Titel, V.CursistEmail, V.BekekenPercentage " +
