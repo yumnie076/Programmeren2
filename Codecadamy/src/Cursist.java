@@ -20,7 +20,6 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
@@ -121,7 +120,7 @@ public class Cursist {
         TableColumn<Cursist, String> geslachtColumn = new TableColumn<>("Geslacht");
         geslachtColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getGeslacht()));
 
-        TableColumn<Cursist, String> woonpTableColumn = new TableColumn<>("woonplaats");
+        TableColumn<Cursist, String> woonpTableColumn = new TableColumn<>("Woonplaats");
         woonpTableColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getWoonplaats()));
 
         cursistenTableView.getColumns()
@@ -143,7 +142,7 @@ public class Cursist {
     private static List<Cursist> getCursistenFromDatabase() {
         List<Cursist> cursisten = new ArrayList<>();
 
-          String url = databaseConnect.getUrl();
+        String url = databaseConnect.getUrl();
         String gebruikersnaam = databaseConnect.getGebruikersnaam();
         String wachtwoord = databaseConnect.GetPass();
 
@@ -459,20 +458,11 @@ public class Cursist {
         countryField.setText(selectedCursist.getLand());
     }
 
-    private static void openHomeVenster() {
-        Stage homeStage = new Stage();
-        homeStage.setTitle("Homepagina");
-
-        // Maak een HomePage-object en roep de start-methode aan
-        Gui homePage = new Gui();
-        homePage.start(homeStage);
-    }
-
     private static void updateCursist(Cursist selectedCursist, String name, String email, String gender,
             LocalDate localDate,
             String address, String city, String country) {
 
-           String url = databaseConnect.getUrl();
+        String url = databaseConnect.getUrl();
         String gebruikersnaam = databaseConnect.getGebruikersnaam();
         String wachtwoord = databaseConnect.GetPass();
 
@@ -513,7 +503,7 @@ public class Cursist {
     private static void submitCursistForm(String name, String email, String gender, Date dob,
             String address, String city, String country) {
 
-           String url = databaseConnect.getUrl();
+        String url = databaseConnect.getUrl();
         String gebruikersnaam = databaseConnect.getGebruikersnaam();
         String wachtwoord = databaseConnect.GetPass();
 
