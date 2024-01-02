@@ -61,11 +61,17 @@ public class Inschrijving {
 
         Button verwijderKnop = new Button("Verwijder Inschrijving");
         verwijderKnop.setOnAction(e -> verwijderGeselecteerdeInschrijving(inschrijvingenTable));
-
+         // Add the update button to your VBox layout
+        Button updateButton = new Button("Update Inschrijving");
+        updateButton.setOnAction(e -> {
+            InschrijvingDetail selected = inschrijvingenTable.getSelectionModel().getSelectedItem();
+            if (selected != null) {
+                openInschrijvingsUpdateForm(selected);
+            } });
         VBox vbox = new VBox(10);
-        vbox.getChildren().addAll(inschrijvingenTable, addButton, verwijderKnop);
+        vbox.getChildren().addAll(inschrijvingenTable, addButton, verwijderKnop,updateButton);
         vbox.setPadding(new Insets(10));
-
+        
         Scene scene = new Scene(vbox, 500, 500);
         overzichtStage.setScene(scene);
         overzichtStage.show();
@@ -240,8 +246,8 @@ public class Inschrijving {
                 int cursusId = resultSet.getInt("CursusID");
                 LocalDate inschrijfDatum = resultSet.getDate("InschrijfDatum").toLocalDate();
 
-                // Aannemende dat de InschrijvingDetail constructor alle benodigde velden als
-                // parameters neemt.
+                // InschrijvingDetail constructor 
+                
                 InschrijvingDetail inschrijving = new InschrijvingDetail(cursistId, cursusId, inschrijfDatum);
                 inschrijvingen.add(inschrijving);
                 inschrijvingenTable.refresh();
@@ -261,5 +267,91 @@ public class Inschrijving {
             table.getItems().remove(geselecteerd);
         }
     }
+
+   
+
+// Method to open the update form
+public static void openInschrijvingsUpdateForm(InschrijvingDetail detail) {
+    Stage updateStage = new Stage();
+    updateStage.setTitle("Update Inschrijving");
+
+    GridPane grid = new GridPane();
+    grid.setPadding(new Insets(10, 10, 10, 10));
+    grid.setAlignment(Pos.CENTER);
+    grid.setVgap(10);
+    grid.setHgap(10);
+
+    Label cursistLabel = new Label("Cursist:");
+    cursistComboBox.setPromptText("Selecteer een cursist");
+    cursistComboBox.setValue(detail.getCursistEmail()); // Pre-fill 
+
+    Label cursusLabel = new Label("Cursus:");
+    cursusComboBox.setPromptText("Selecteer een cursus");
+    cursusComboBox.setValue(getCursusNaamFromId(detail.getCursusId())); // Pre-fill 
+
+    Label datumLabel = new Label("Datum:");
+    DatePicker datePicker = new DatePicker();
+    datePicker.setValue(detail.getInschrijfDatum()); // Pre-fill 
+
+    Button updateButton = new Button("Update");
+    updateButton.setOnAction(e -> {
+        String selectedCursistEmail = cursistComboBox.getValue();
+        String selectedCursusNaam = cursusComboBox.getValue();
+        LocalDate inschrijfDatum = datePicker.getValue();
+        if (selectedCursistEmail != null && selectedCursusNaam != null && inschrijfDatum != null) {
+            int selectedCursusId = cursusIdMap.get(selectedCursusNaam);
+            updateInschrijving(selectedCursistEmail, selectedCursusId, inschrijfDatum);
+            updateStage.close();
+        }
+    });
+
+    grid.add(cursistLabel, 0, 0);
+    grid.add(cursistComboBox, 1, 0);
+    grid.add(cursusLabel, 0, 1);
+    grid.add(cursusComboBox, 1, 1);
+    grid.add(datumLabel, 0, 2);
+    grid.add(datePicker, 1, 2);
+    grid.add(updateButton, 1, 3);
+
+    Scene scene = new Scene(grid, 300, 275);
+    updateStage.setScene(scene);
+    updateStage.show();
+}
+
+private static String getCursusNaamFromId(int cursusId) {
+    for (Map.Entry<String, Integer> entry : cursusIdMap.entrySet()) {
+        if (entry.getValue().equals(cursusId)) {
+            return entry.getKey();
+        }
+    }
+    return null; 
+}
+
+    public static void updateInschrijving(String cursistEmail, int cursusId, LocalDate inschrijfDatum) {
+        String url = databaseConnect.getUrl();
+        String gebruikersnaam = databaseConnect.getGebruikersnaam();
+        String wachtwoord = databaseConnect.GetPass();
+    
+        try (Connection connection = DriverManager.getConnection(url, gebruikersnaam, wachtwoord)) {
+            String query = "UPDATE Inschrijving SET CursusID = ?, InschrijfDatum = ? WHERE CursistEmail = ?";
+    
+            try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+                preparedStatement.setInt(1, cursusId);
+                preparedStatement.setDate(2, java.sql.Date.valueOf(inschrijfDatum));
+                preparedStatement.setString(3, cursistEmail);
+    
+                int affectedRows = preparedStatement.executeUpdate();
+                if (affectedRows > 0) {
+                    System.out.println("Inschrijving is succesvol bijgewerkt voor cursist: " + cursistEmail);
+                } else {
+                    System.out.println("Er is een probleem opgetreden bij het bijwerken van de inschrijving.");
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("Databasefout: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+    
 
 }
