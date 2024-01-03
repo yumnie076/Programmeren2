@@ -20,7 +20,6 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
@@ -81,10 +80,6 @@ public class Cursist {
     public String getLand() {
         return land;
     }
-    public static void applyStylesheet(Scene scene) {
-        String css = Inschrijving.class.getResource("style.css").toExternalForm();
-        scene.getStylesheets().add(css);
-    }
 
     public static void openCursistVenster() {
         Stage cursistStage = new Stage();
@@ -118,16 +113,16 @@ public class Cursist {
         // Voeg lijst met cursisten toe
         TableColumn<Cursist, String> naamColumn = new TableColumn<>("Naam");
         naamColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getNaam()));
-        naamColumn.setMinWidth(100);
+
         TableColumn<Cursist, String> emailColumn = new TableColumn<>("Email");
         emailColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getEmail()));
-        emailColumn.setMinWidth(100);
+
         TableColumn<Cursist, String> geslachtColumn = new TableColumn<>("Geslacht");
         geslachtColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getGeslacht()));
-        geslachtColumn.setMinWidth(100);
-        TableColumn<Cursist, String> woonpTableColumn = new TableColumn<>("woonplaats");
+
+        TableColumn<Cursist, String> woonpTableColumn = new TableColumn<>("Woonplaats");
         woonpTableColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getWoonplaats()));
-        woonpTableColumn.setMinWidth(100);
+
         cursistenTableView.getColumns()
                 .addAll(Arrays.asList(naamColumn, emailColumn, geslachtColumn, woonpTableColumn));
 
@@ -140,7 +135,6 @@ public class Cursist {
 
         // Maak een Scene en toon het venster
         Scene scene = new Scene(vbox, 500, 500);
-        applyStylesheet(scene);
         cursistStage.setScene(scene);
         cursistStage.show();
     }
@@ -148,7 +142,7 @@ public class Cursist {
     private static List<Cursist> getCursistenFromDatabase() {
         List<Cursist> cursisten = new ArrayList<>();
 
-          String url = databaseConnect.getUrl();
+        String url = databaseConnect.getUrl();
         String gebruikersnaam = databaseConnect.getGebruikersnaam();
         String wachtwoord = databaseConnect.GetPass();
 
@@ -329,7 +323,6 @@ public class Cursist {
 
         // Maak een Scene en toon het venster
         Scene scene = new Scene(grid, 400, 300);
-        applyStylesheet(scene);
         createCursistStage.setScene(scene);
         createCursistStage.show();
     }
@@ -447,7 +440,6 @@ public class Cursist {
         VBox vbox = new VBox(10);
         vbox.getChildren().addAll(titleBox, grid, updateButton);
         Scene scene = new Scene(vbox, 300, 400);
-        applyStylesheet(scene);
         updateCursistStage.setScene(scene);
         updateCursistStage.show();
     }
@@ -466,20 +458,11 @@ public class Cursist {
         countryField.setText(selectedCursist.getLand());
     }
 
-    private static void openHomeVenster() {
-        Stage homeStage = new Stage();
-        homeStage.setTitle("Homepagina");
-
-        // Maak een HomePage-object en roep de start-methode aan
-        Gui homePage = new Gui();
-        homePage.start(homeStage);
-    }
-
     private static void updateCursist(Cursist selectedCursist, String name, String email, String gender,
             LocalDate localDate,
             String address, String city, String country) {
 
-           String url = databaseConnect.getUrl();
+        String url = databaseConnect.getUrl();
         String gebruikersnaam = databaseConnect.getGebruikersnaam();
         String wachtwoord = databaseConnect.GetPass();
 
@@ -520,7 +503,7 @@ public class Cursist {
     private static void submitCursistForm(String name, String email, String gender, Date dob,
             String address, String city, String country) {
 
-           String url = databaseConnect.getUrl();
+        String url = databaseConnect.getUrl();
         String gebruikersnaam = databaseConnect.getGebruikersnaam();
         String wachtwoord = databaseConnect.GetPass();
 

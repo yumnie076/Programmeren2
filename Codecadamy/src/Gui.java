@@ -36,7 +36,7 @@ public class Gui extends Application {
         Button buttonCursist = new Button("Cursist");
         Button buttonOverview = new Button("Overview pages");
         Button buttonInschrijving = new Button("Inschrijving");
-        
+
         // Voeg knopfunctionaliteit toe
         buttonCursist.setOnAction(e -> Cursist.openCursistVenster());
         buttonOverview.setOnAction(e -> Overview.openOverviewPage());
