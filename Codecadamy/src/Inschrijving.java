@@ -7,6 +7,7 @@ import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -16,7 +17,9 @@ import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.layout.GridPane;
@@ -28,13 +31,18 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TableColumn;
 
 public class Inschrijving {
-
+ 
+    
     private static ComboBox<String> cursistComboBox = new ComboBox<>();
     private static ComboBox<String> cursusComboBox = new ComboBox<>();
     private static Map<String, Integer> cursusIdMap = new HashMap<>();
     private static TableView<InschrijvingDetail> inschrijvingenTable;
     private static ObservableList<InschrijvingDetail> data = FXCollections.observableArrayList();
-
+    
+    public static void applyStylesheet(Scene scene) {
+        String css = Inschrijving.class.getResource("style.css").toExternalForm();
+        scene.getStylesheets().add(css);
+    }
     public static void openInschrijvingenVenster() {
         Stage overzichtStage = new Stage();
         overzichtStage.setTitle("Inschrijvingen Overzicht");
@@ -45,10 +53,13 @@ public class Inschrijving {
         // Kolommen voor tabel
         TableColumn<InschrijvingDetail, String> cursistCol = new TableColumn<>("Cursist Email");
         cursistCol.setCellValueFactory(new PropertyValueFactory<>("cursistEmail"));
+        cursistCol.setMinWidth(150);
         TableColumn<InschrijvingDetail, String> cursusCol = new TableColumn<>("Cursus ID");
         cursusCol.setCellValueFactory(new PropertyValueFactory<>("cursusId"));
+        cursusCol.setMinWidth(100);
         TableColumn<InschrijvingDetail, String> datumCol = new TableColumn<>("Inschrijf Datum");
         datumCol.setCellValueFactory(new PropertyValueFactory<>("inschrijfDatum"));
+        datumCol.setMinWidth(150);
 
         inschrijvingenTable.getColumns()
                 .addAll(Arrays.asList(cursistCol, cursusCol, datumCol));
@@ -59,8 +70,12 @@ public class Inschrijving {
         Button addButton = new Button("Maak inschrijving aan");
         addButton.setOnAction(e -> openInschrijvingsFormulier());
 
+       
         Button verwijderKnop = new Button("Verwijder Inschrijving");
-        verwijderKnop.setOnAction(e -> verwijderGeselecteerdeInschrijving(inschrijvingenTable));
+        verwijderKnop.setOnAction(e -> {
+            deleteSelectedInschrijving();
+        });
+        
          // Add the update button to your VBox layout
         Button updateButton = new Button("Update Inschrijving");
         updateButton.setOnAction(e -> {
@@ -73,10 +88,11 @@ public class Inschrijving {
         vbox.setPadding(new Insets(10));
         
         Scene scene = new Scene(vbox, 500, 500);
+        applyStylesheet(scene);
         overzichtStage.setScene(scene);
         overzichtStage.show();
     }
-
+ 
     public static void openInschrijvingsFormulier() {
         Stage inschrijvingsStage = new Stage();
         inschrijvingsStage.setTitle("Inschrijving");
@@ -120,10 +136,12 @@ public class Inschrijving {
         vulCursusComboBox();
 
         Scene scene = new Scene(grid, 300, 275);
+        applyStylesheet(scene);
         inschrijvingsStage.setScene(scene);
         inschrijvingsStage.show();
     }
-
+   
+    
     private static void vulCursistenComboBox() {
         String url = databaseConnect.getUrl();
         String gebruikersnaam = databaseConnect.getGebruikersnaam();
@@ -260,13 +278,60 @@ public class Inschrijving {
         return inschrijvingen;
     }
 
-    private static void verwijderGeselecteerdeInschrijving(TableView<InschrijvingDetail> table) {
-        InschrijvingDetail geselecteerd = table.getSelectionModel().getSelectedItem();
-        if (geselecteerd != null) {
+private static void deleteSelectedInschrijving() {
+    InschrijvingDetail selectedInschrijving = inschrijvingenTable.getSelectionModel().getSelectedItem();
 
-            table.getItems().remove(geselecteerd);
+    if (selectedInschrijving != null) {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Bevestig Verwijdering");
+        alert.setHeaderText("Weet je zeker dat je de inschrijving wilt verwijderen?");
+        alert.setContentText("Geselecteerde inschrijving: " + selectedInschrijving);
+
+        Optional<ButtonType> result = alert.showAndWait();
+        if (result.isPresent() && result.get() == ButtonType.OK) {
+            deleteInschrijvingFromDatabase(selectedInschrijving);
+
+            data.setAll(haalInschrijvingenOp());
         }
+    } else {
+        Alert alert = new Alert(Alert.AlertType.WARNING);
+        alert.setTitle("Geen Inschrijving Geselecteerd");
+        alert.setHeaderText(null);
+        alert.setContentText("Selecteer eerst een inschrijving om te verwijderen.");
+        alert.showAndWait();
     }
+}
+
+    
+private static void deleteInschrijvingFromDatabase(InschrijvingDetail selectedInschrijving) {
+    String url = databaseConnect.getUrl();
+    String gebruikersnaam = databaseConnect.getGebruikersnaam();
+    String wachtwoord = databaseConnect.GetPass();
+
+    String query = "DELETE FROM Inschrijving WHERE CursistEmail = ? AND CursusID = ? AND InschrijfDatum = ?";
+
+    try (Connection connection = DriverManager.getConnection(url, gebruikersnaam, wachtwoord);
+         PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+
+        preparedStatement.setString(1, selectedInschrijving.getCursistEmail());
+        preparedStatement.setInt(2, selectedInschrijving.getCursusId());
+        preparedStatement.setDate(3, java.sql.Date.valueOf(selectedInschrijving.getInschrijfDatum()));
+
+        int rowsAffected = preparedStatement.executeUpdate();
+        if (rowsAffected > 0) {
+            System.out.println("Inschrijving succesvol verwijderd uit de database.");
+        } else {
+            System.out.println("Geen inschrijving gevonden om te verwijderen.");
+        }
+    } catch (SQLException e) {
+        System.out.println("SQL Fout: " + e.getMessage());
+        e.printStackTrace();
+    }
+}
+
+
+    
+    
 
    
 
@@ -314,6 +379,7 @@ public static void openInschrijvingsUpdateForm(InschrijvingDetail detail) {
     grid.add(updateButton, 1, 3);
 
     Scene scene = new Scene(grid, 300, 275);
+    applyStylesheet(scene);
     updateStage.setScene(scene);
     updateStage.show();
 }

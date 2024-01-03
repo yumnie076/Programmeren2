@@ -1,0 +1,96 @@
+/* General Application Styles */
+.root {
+    -fx-font-family: 'Arial', sans-serif;
+    -fx-background-color: linear-gradient(to right, #83a4d4, #b6fbff);
+}
+
+/* Button Styles */
+.button {
+    -fx-background-color: #76b5c5;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-border-radius: 5;
+    -fx-background-radius: 5;
+    -fx-padding: 10px 20px;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.8), 10, 0, 0, 0);
+    -fx-transition: all 0.3s ease;
+}
+
+.button:hover {
+    -fx-background-color: #559bad;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.8), 20, 0, 0, 0);
+    -fx-scalex: 1.05;
+    -fx-scaley: 1.05;
+}
+
+/* Table View Styles */
+.table-view {
+    -fx-background-color: white;
+    -fx-border-color: #d0d0d0;
+    -fx-border-radius: 5;
+    -fx-background-radius: 5;
+}
+
+.table-row-cell:filled:selected {
+    -fx-background-color: #a8d0e6;
+}
+
+.table-column {
+    -fx-alignment: CENTER-LEFT;
+}
+
+/* Label Styles */
+.label {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #333333;
+}
+/* Table View Styles */
+.table-view {
+    -fx-background-color: #f4f4f4;
+    -fx-border-color: #d3d3d3;
+    -fx-border-radius: 5;
+    -fx-background-radius: 5;
+}
+
+/* Header Row Style */
+.table-view .column-header-background {
+    -fx-background-color: #4059a9;
+}
+
+.table-view .column-header .label {
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+}
+
+/* Table Row and Cell Styles */
+.table-view .table-row-cell {
+    -fx-background-color: #f4f4f4;
+    -fx-border-color: transparent;
+    -fx-table-cell-border-color: transparent;
+}
+
+.table-view .table-row-cell:filled:selected {
+    -fx-background-color: #b0c4de;
+    -fx-text-fill: black;
+}
+
+.table-view .table-row-cell:filled:hover {
+    -fx-background-color: #dae7f3;
+}
+
+.table-view .table-cell {
+    -fx-padding: 5px;
+}
+
+/* Layout and Padding */
+.vbox, .hbox {
+    -fx-spacing: 10px;
+    -fx-alignment: center;
+}
+
+/* Combo Box Styles */
+.combo-box {
+    -fx-font-size: 14px;
+}

@@ -11,6 +11,7 @@ import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
 public class Gui extends Application {
+   
     @Override
 
     public void start(Stage primaryStage) {
@@ -49,6 +50,7 @@ public class Gui extends Application {
 
         // Maak een Scene en toon het venster
         Scene scene = new Scene(vbox, 700, 700);
+        scene.getStylesheets().add(getClass().getResource("style.css").toExternalForm());
         primaryStage.setScene(scene);
         primaryStage.show();
     }

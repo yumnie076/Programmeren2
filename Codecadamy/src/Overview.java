@@ -26,6 +26,10 @@ import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
 public class Overview {
+    public static void applyStylesheet(Scene scene) {
+        String css = Inschrijving.class.getResource("style.css").toExternalForm();
+        scene.getStylesheets().add(css);
+    }
     public static void openOverviewPage() {
         Stage overviewStage = new Stage();
         overviewStage.setTitle("Overview pagina");
@@ -57,6 +61,7 @@ public class Overview {
 
         // Maak een Scene en toon het venster
         Scene scene = new Scene(vbox, 500, 500);
+        applyStylesheet(scene);
         overviewStage.setScene(scene);
         overviewStage.show();
     }
@@ -116,6 +121,7 @@ public class Overview {
         }
 
         Scene scene = new Scene(vbox, 500, 500);
+        applyStylesheet(scene);
         topWebcast.setScene(scene);
         topWebcast.show();
     }
@@ -158,6 +164,7 @@ public class Overview {
         vbox.getChildren().add(selectieBox);
 
         Scene scene = new Scene(vbox, 500, 500);
+        applyStylesheet(scene);
         average.setScene(scene);
         average.show();
     }
