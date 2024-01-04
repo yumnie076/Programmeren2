@@ -91,61 +91,64 @@ public class Cursist {
     }
 
     public static void openCursistVenster() {
-        Stage cursistStage = new Stage();
-        cursistStage.setTitle("Cursistpagina");
+        cursistenTableView.getColumns().clear();
+        if (cursistenTableView.getColumns().isEmpty()) {
+            Stage cursistStage = new Stage();
+            cursistStage.setTitle("Cursistpagina");
 
-        // Titel bovenaan de pagina
-        Text title = new Text("Cursisten Overzicht");
-        title.setFont(Font.font("Verdana", FontWeight.BOLD, 14));
+            // Titel bovenaan de pagina
+            Text title = new Text("Cursisten Overzicht");
+            title.setFont(Font.font("Verdana", FontWeight.BOLD, 14));
 
-        // Maak een HBox voor het opmaken van de titel
-        HBox titleBox = new HBox();
-        titleBox.getChildren().add(title);
-        titleBox.setAlignment(javafx.geometry.Pos.TOP_CENTER);
-        titleBox.setPadding(new Insets(10, 10, 10, 10));
+            // Maak een HBox voor het opmaken van de titel
+            HBox titleBox = new HBox();
+            titleBox.getChildren().add(title);
+            titleBox.setAlignment(javafx.geometry.Pos.TOP_CENTER);
+            titleBox.setPadding(new Insets(10, 10, 10, 10));
 
-        // Maak een VBox voor het opmaken van de knoppen en de lijst met cursisten
-        VBox vbox = new VBox(10); // 10 is de verticale ruimte tussen knoppen en lijst
-        vbox.setPadding(new Insets(10, 10, 10, 10));
-        vbox.setAlignment(javafx.geometry.Pos.CENTER); // Knoppen en lijst in het midden van de pagina
+            // Maak een VBox voor het opmaken van de knoppen en de lijst met cursisten
+            VBox vbox = new VBox(10); // 10 is de verticale ruimte tussen knoppen en lijst
+            vbox.setPadding(new Insets(10, 10, 10, 10));
+            vbox.setAlignment(javafx.geometry.Pos.CENTER); // Knoppen en lijst in het midden van de pagina
 
-        // Voeg knoppen toe aan de VBox
-        Button addButton = new Button("Voeg Cursist Toe");
-        addButton.setOnAction(e -> CreateCursist());
+            // Voeg knoppen toe aan de VBox
+            Button addButton = new Button("Voeg Cursist Toe");
+            addButton.setOnAction(e -> CreateCursist());
 
-        Button deleteButton = new Button("Verwijder Geselecteerde Cursist");
-        deleteButton.setOnAction(e -> deleteSelectedCursist());
+            Button deleteButton = new Button("Verwijder Geselecteerde Cursist");
+            deleteButton.setOnAction(e -> deleteSelectedCursist());
 
-        Button updateButton = new Button("Update Geselecteerde Cursist");
-        updateButton.setOnAction(e -> updateSelectedCursist());
+            Button updateButton = new Button("Update Geselecteerde Cursist");
+            updateButton.setOnAction(e -> updateSelectedCursist());
 
-        // Voeg lijst met cursisten toe
-        TableColumn<Cursist, String> naamColumn = new TableColumn<>("Naam");
-        naamColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getNaam()));
+            // Voeg lijst met cursisten toe
+            TableColumn<Cursist, String> naamColumn = new TableColumn<>("Naam");
+            naamColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getNaam()));
 
-        TableColumn<Cursist, String> emailColumn = new TableColumn<>("Email");
-        emailColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getEmail()));
+            TableColumn<Cursist, String> emailColumn = new TableColumn<>("Email");
+            emailColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getEmail()));
 
-        TableColumn<Cursist, String> geslachtColumn = new TableColumn<>("Geslacht");
-        geslachtColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getGeslacht()));
+            TableColumn<Cursist, String> geslachtColumn = new TableColumn<>("Geslacht");
+            geslachtColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getGeslacht()));
 
-        TableColumn<Cursist, String> woonpTableColumn = new TableColumn<>("Woonplaats");
-        woonpTableColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getWoonplaats()));
+            TableColumn<Cursist, String> woonpTableColumn = new TableColumn<>("Woonplaats");
+            woonpTableColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getWoonplaats()));
 
-        cursistenTableView.getColumns()
-                .addAll(Arrays.asList(naamColumn, emailColumn, geslachtColumn, woonpTableColumn));
+            cursistenTableView.getColumns()
+                    .addAll(Arrays.asList(naamColumn, emailColumn, geslachtColumn, woonpTableColumn));
 
-        // Populate data for the TableView
-        cursistenTableView.refresh();
-        cursisten.setAll(getCursistenFromDatabase());
-        cursistenTableView.setItems(cursisten);
+            // Populate data for the TableView
+            cursistenTableView.refresh();
+            cursisten.setAll(getCursistenFromDatabase());
+            cursistenTableView.setItems(cursisten);
 
-        vbox.getChildren().addAll(titleBox, cursistenTableView, addButton, deleteButton, updateButton);
+            vbox.getChildren().addAll(titleBox, cursistenTableView, addButton, deleteButton, updateButton);
 
-        // Maak een Scene en toon het venster
-        Scene scene = new Scene(vbox, 500, 500);
-        cursistStage.setScene(scene);
-        cursistStage.show();
+            // Maak een Scene en toon het venster
+            Scene scene = new Scene(vbox, 500, 500);
+            cursistStage.setScene(scene);
+            cursistStage.show();
+        }
     }
 
     private static List<Cursist> getCursistenFromDatabase() {
@@ -450,11 +453,13 @@ public class Cursist {
         TextField cityField = new TextField();
         TextField countryField = new TextField();
 
+        String formattedPostcode = formatPostcode(postCodeField.getText());
+
         Button updateButton = new Button("Update");
         updateButton.setOnAction(e -> {
             updateCursist(selectedCursist, nameField.getText(), emailField.getText(),
                     genderChoiceBox.getValue(), dobPicker.getValue(),
-                    addressField.getText(), postCodeField.getText(), cityField.getText(), countryField.getText());
+                    addressField.getText(), formattedPostcode, cityField.getText(), countryField.getText());
             updateCursistStage.close();
             // Update the TableView
             cursisten.setAll(getCursistenFromDatabase());
