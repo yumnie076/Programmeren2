@@ -298,11 +298,12 @@ public class Cursist {
         TextField postCodeField = new TextField();
         TextField cityField = new TextField();
         TextField countryField = new TextField();
-        String formattedPostCode = formatPostcode(postCodeField.getText());
+
         // Knop voor submit
         Button submitButton = new Button("Submit");
         submitButton.setOnAction(e -> {
             // Converteer DatePicker-waarde naar java.sql.Date
+            String formattedPostCode = formatPostcode(postCodeField.getText());
             Date dobDate = null;
             if (dobPicker.getValue() != null) {
                 dobDate = Date.valueOf(dobPicker.getValue());
@@ -453,10 +454,9 @@ public class Cursist {
         TextField cityField = new TextField();
         TextField countryField = new TextField();
 
-        String formattedPostcode = formatPostcode(postCodeField.getText());
-
         Button updateButton = new Button("Update");
         updateButton.setOnAction(e -> {
+            String formattedPostcode = formatPostcode(postCodeField.getText());
             updateCursist(selectedCursist, nameField.getText(), emailField.getText(),
                     genderChoiceBox.getValue(), dobPicker.getValue(),
                     addressField.getText(), formattedPostcode, cityField.getText(), countryField.getText());
