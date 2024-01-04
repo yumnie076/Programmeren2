@@ -30,6 +30,7 @@ public class Overview {
         String css = Inschrijving.class.getResource("style.css").toExternalForm();
         scene.getStylesheets().add(css);
     }
+
     public static void openOverviewPage() {
         Stage overviewStage = new Stage();
         overviewStage.setTitle("Overview pagina");
@@ -50,7 +51,9 @@ public class Overview {
 
         Button average = new Button("Gemiddelde voortgang per module");
         average.setOnAction(e -> average());
+
         Button averagePerson = new Button("Gemiddelde voortgang per module per persoon");
+        averagePerson.setOnAction(e -> averagePerson());
 
         Button top3 = new Button("Top 3 meest bekeken webcasts");
         top3.setOnAction(e -> topWebcast());
@@ -84,7 +87,7 @@ public class Overview {
 
         vbox.getChildren().addAll(titleBox);
         String url = databaseConnect.getUrl();
-        String gebruikersnaam = databaseConnect.GetPass();
+        String gebruikersnaam = databaseConnect.getGebruikersnaam();
         String wachtwoord = databaseConnect.GetPass();
 
         String query = "SELECT TOP 3 W.Titel, V.CursistEmail, V.BekekenPercentage " +
@@ -169,10 +172,54 @@ public class Overview {
         average.show();
     }
 
+    static void averagePerson() {
+        Stage averagePerson = new Stage();
+        averagePerson.setTitle("Gemiddelde voortgang per module per persoon");
+
+        Text title = new Text("Gemiddelde voortgang per module per persoon");
+        title.setFont(Font.font("Verdana", FontWeight.BOLD, 18));
+
+        HBox titleBox = new HBox();
+        titleBox.getChildren().add(title);
+        titleBox.setAlignment(Pos.TOP_CENTER);
+        titleBox.setPadding(new Insets(10, 10, 10, 10));
+
+        VBox vbox = new VBox(10);
+        vbox.setPadding(new Insets(10, 10, 10, 10));
+        vbox.setAlignment(Pos.CENTER);
+        vbox.getChildren().addAll(titleBox);
+
+        // Choicebox for cursist
+        ComboBox<String> cursistComboBox = new ComboBox<>(
+                FXCollections.observableArrayList(getCursistNamenFromDB()));
+        cursistComboBox.setPromptText("Selecteer Cursist");
+
+        // Keuzelijst voor cursussen
+        ComboBox<String> cursusComboBox = new ComboBox<>(
+                FXCollections.observableArrayList(getCursusNamenFromDatabase()));
+        cursusComboBox.setPromptText("Selecteer Cursus");
+
+        Button calculateButton = new Button("Bereken Gemiddelde Voortgang");
+        calculateButton
+                .setOnAction(e -> showAveragePercentage(cursusComboBox.getValue(), cursistComboBox.getValue(), vbox));
+
+        HBox selectieBox = new HBox(10);
+        selectieBox.getChildren().addAll(new Label("Selecteer een cursus: "), cursistComboBox, cursusComboBox,
+                calculateButton);
+        selectieBox.setAlignment(Pos.CENTER);
+
+        vbox.getChildren().add(selectieBox);
+
+        Scene scene = new Scene(vbox, 800, 800);
+        applyStylesheet(scene);
+        averagePerson.setScene(scene);
+        averagePerson.show();
+    }
+
     private static void toonGemiddeldeVoortgang(String geselecteerdeCursus, VBox vbox) {
         int geselecteerdeCursusID = getCursusIDFromDatabase(geselecteerdeCursus);
         String url = databaseConnect.getUrl();
-        String gebruikersnaam = databaseConnect.GetPass();
+        String gebruikersnaam = databaseConnect.getGebruikersnaam();
         String wachtwoord = databaseConnect.GetPass();
         Label moduleLabel = new Label();
         try {
@@ -216,9 +263,58 @@ public class Overview {
         }
     }
 
+    private static void showAveragePercentage(String geselecteerdeCursus, String geselecteerdeCursist, VBox vbox) {
+        int geselecteerdeCursusID = getCursusIDFromDatabase(geselecteerdeCursus);
+        String url = databaseConnect.getUrl();
+        String gebruikersnaam = databaseConnect.getGebruikersnaam();
+        String wachtwoord = databaseConnect.GetPass();
+        Label moduleLabel = new Label();
+        try {
+            Connection connection = DriverManager.getConnection(url, gebruikersnaam, wachtwoord);
+            String query = "SELECT m.ModuleID, m.Titel AS ModuleNaam, COALESCE(MAX(vm.VoortgangPercentage), 0)  AS GemiddeldeVoortgangPercentage "
+                    + "FROM Module m "
+                    + "JOIN Cursus c ON m.CursusID = c.CursusID "
+                    + "LEFT JOIN VoortgangModule vm ON m.ModuleID = vm.ModuleID "
+                    + "AND vm.CursistEmail = ?"
+                    + "WHERE c.CursusID = ? "
+                    + "GROUP BY m.ModuleID, m.Titel";
+
+            try (PreparedStatement statement = connection.prepareStatement(query)) {
+                statement.setString(1, geselecteerdeCursist);
+                statement.setInt(2, geselecteerdeCursusID);
+                vbox.getChildren().clear();
+                try (ResultSet resultSet = statement.executeQuery()) {
+                    // Voeg gemiddelde voortgang per module toe aan de JavaFX GUI
+                    moduleLabel.setText("");
+                    boolean rowsFound = false;
+                    while (resultSet.next()) {
+                        rowsFound = true;
+                        int moduleID = resultSet.getInt("ModuleID");
+                        String moduleNaam = resultSet.getString("ModuleNaam");
+                        double gemiddeldeVoortgang = resultSet.getDouble("GemiddeldeVoortgangPercentage");
+
+                        moduleLabel.setText(
+                                moduleNaam + " (Module ID: " + moduleID + "): " + gemiddeldeVoortgang + "%");
+                        vbox.getChildren().add(moduleLabel);
+                    }
+
+                    if (!rowsFound) {
+                        Label noDataLabel = new Label("Geen gegevens gevonden voor de geselecteerde cursus.");
+                        vbox.getChildren().add(noDataLabel);
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            // Voeg een foutmelding toe aan de GUI als er een SQL-fout optreedt
+            Label errorLabel = new Label("Fout bij het ophalen van gegevens: " + e.getMessage());
+            vbox.getChildren().add(errorLabel);
+        }
+    }
+
     private static String[] getCursusNamenFromDatabase() {
         String url = databaseConnect.getUrl();
-        String gebruikersnaam = databaseConnect.GetPass();
+        String gebruikersnaam = databaseConnect.getGebruikersnaam();
         String wachtwoord = databaseConnect.GetPass();
 
         try {
@@ -241,9 +337,34 @@ public class Overview {
         }
     }
 
+    private static String[] getCursistNamenFromDB() {
+        String url = databaseConnect.getUrl();
+        String gebruikersnaam = databaseConnect.getGebruikersnaam();
+        String wachtwoord = databaseConnect.GetPass();
+
+        try {
+            Connection connection = DriverManager.getConnection(url, gebruikersnaam, wachtwoord);
+            String query = "SELECT Email FROM Cursist";
+            try (PreparedStatement statement = connection.prepareStatement(query);
+                    ResultSet resultSet = statement.executeQuery()) {
+
+                // Voeg cursusnamen toe aan de keuzelijst
+                List<String> cursistNamenList = new ArrayList<>();
+                while (resultSet.next()) {
+                    cursistNamenList.add(resultSet.getString("Email"));
+                }
+
+                return cursistNamenList.toArray(new String[0]);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return new String[0];
+        }
+    }
+
     private static int getCursusIDFromDatabase(String cursusNaam) {
         String url = databaseConnect.getUrl();
-        String gebruikersnaam = databaseConnect.GetPass();
+        String gebruikersnaam = databaseConnect.getGebruikersnaam();
         String wachtwoord = databaseConnect.GetPass();
 
         try (Connection connection = DriverManager.getConnection(url, gebruikersnaam, wachtwoord)) {

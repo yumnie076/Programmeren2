@@ -8,6 +8,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
@@ -39,16 +41,19 @@ public class Cursist {
     private String geslacht;
     private Date geboortedatum;
     private String adres;
+    private String postcode;
     private String woonplaats;
     private String land;
 
-    public Cursist(String naam, String email, String geslacht, Date cursistDatum, String adres, String woonplaats,
+    public Cursist(String naam, String email, String geslacht, Date cursistDatum, String adres, String postcode,
+            String woonplaats,
             String land) {
         this.naam = naam;
         this.email = email;
         this.geslacht = geslacht;
         this.geboortedatum = cursistDatum;
         this.adres = adres;
+        this.postcode = postcode;
         this.woonplaats = woonplaats;
         this.land = land;
     }
@@ -71,6 +76,10 @@ public class Cursist {
 
     public String getAdres() {
         return adres;
+    }
+
+    public String getPostcode() {
+        return postcode;
     }
 
     public String getWoonplaats() {
@@ -167,9 +176,11 @@ public class Cursist {
                 String cursistGender = resultSet.getString("Geslacht");
                 Date cursistDatum = resultSet.getDate("Geboortedatum");
                 String cursistAdres = resultSet.getString("adres");
+                String cursistPostcode = resultSet.getString("postcode");
                 String cursistWoonplaats = resultSet.getString("woonplaats");
                 String cursistLand = resultSet.getString("Land");
                 Cursist cursist = new Cursist(cursistNaam, cursistEmail, cursistGender, cursistDatum, cursistAdres,
+                        cursistPostcode,
                         cursistWoonplaats, cursistLand);
                 cursisten.add(cursist);
 
@@ -250,7 +261,7 @@ public class Cursist {
 
     static void CreateCursist() {
         Stage createCursistStage = new Stage();
-        createCursistStage.setTitle("Cursistpagina");
+        createCursistStage.setTitle("Create Cursist");
 
         // Maak een GridPane voor het opmaken van het formulier
         GridPane grid = new GridPane();
@@ -265,6 +276,7 @@ public class Cursist {
         Label genderLabel = new Label("Geslacht:");
         Label dobLabel = new Label("Geboortedatum:");
         Label addressLabel = new Label("Adres:");
+        Label postcodeLabel = new Label("Postcode:");
         Label cityLabel = new Label("Woonplaats:");
         Label countryLabel = new Label("Land:");
 
@@ -280,9 +292,10 @@ public class Cursist {
         DatePicker dobPicker = new DatePicker();
 
         TextField addressField = new TextField();
+        TextField postCodeField = new TextField();
         TextField cityField = new TextField();
         TextField countryField = new TextField();
-
+        String formattedPostCode = formatPostcode(postCodeField.getText());
         // Knop voor submit
         Button submitButton = new Button("Submit");
         submitButton.setOnAction(e -> {
@@ -295,7 +308,7 @@ public class Cursist {
                 // Als de invoer geldig is, voeg de cursist toe
                 submitCursistForm(nameField.getText(), emailField.getText(),
                         genderChoiceBox.getValue(), dobDate,
-                        addressField.getText(), cityField.getText(), countryField.getText());
+                        addressField.getText(), formattedPostCode, cityField.getText(), countryField.getText());
 
                 // Sluit het venster na het toevoegen van de cursist
                 createCursistStage.close();
@@ -315,14 +328,16 @@ public class Cursist {
         grid.add(dobPicker, 1, 3);
         grid.add(addressLabel, 0, 4);
         grid.add(addressField, 1, 4);
-        grid.add(cityLabel, 0, 5);
-        grid.add(cityField, 1, 5);
-        grid.add(countryLabel, 0, 6);
-        grid.add(countryField, 1, 6);
-        grid.add(submitButton, 0, 7, 2, 1); // De submitButton beslaat 2 kolommen
+        grid.add(postcodeLabel, 0, 5);
+        grid.add(postCodeField, 1, 5);
+        grid.add(cityLabel, 0, 6);
+        grid.add(cityField, 1, 6);
+        grid.add(countryLabel, 0, 7);
+        grid.add(countryField, 1, 7);
+        grid.add(submitButton, 0, 8, 2, 1); // De submitButton beslaat 2 kolommen
 
         // Maak een Scene en toon het venster
-        Scene scene = new Scene(grid, 400, 300);
+        Scene scene = new Scene(grid, 500, 400);
         createCursistStage.setScene(scene);
         createCursistStage.show();
     }
@@ -357,6 +372,31 @@ public class Cursist {
 
     private static boolean isValidEmail(String email) {
         return email.matches("^[a-zA-Z0-9_]+@[a-zA-Z0-9]+\\.[a-zA-Z]{2,}$");
+    }
+
+    private static String formatPostcode(String postcode) {
+        String postalCodePattern = "^[1-9]\\d{3}\\s[A-Z]{2}$";
+
+        // Compile the pattern
+        Pattern pattern = Pattern.compile(postalCodePattern);
+
+        // Create a matcher for the entered postal code
+        Matcher matcher = pattern.matcher(postcode);
+
+        // Check if the entered postal code matches the pattern
+        if (matcher.matches()) {
+            // The postal code is valid, no further action needed
+            return postcode;
+        } else {
+            // The entered postal code does not match the expected format, attempt to format
+            // Remove any non-numeric characters
+            String numericDigits = postcode.replaceAll("\\D", "");
+
+            // Format the numeric digits and add the space and uppercase letters
+            String formattedPostalCode = numericDigits.substring(0, 4) + " " + numericDigits.substring(4, 6);
+
+            return formattedPostalCode;
+        }
     }
 
     private static void updateSelectedCursist() {
@@ -396,6 +436,7 @@ public class Cursist {
         Label genderLabel = new Label("Geslacht:");
         Label dobLabel = new Label("Geboortedatum:");
         Label addressLabel = new Label("Adres:");
+        Label postcodeLabel = new Label("Postcode");
         Label cityLabel = new Label("Woonplaats:");
         Label countryLabel = new Label("Land:");
 
@@ -405,6 +446,7 @@ public class Cursist {
         genderChoiceBox.getItems().addAll("Man", "Vrouw", "Anders");
         DatePicker dobPicker = new DatePicker();
         TextField addressField = new TextField();
+        TextField postCodeField = new TextField();
         TextField cityField = new TextField();
         TextField countryField = new TextField();
 
@@ -412,7 +454,7 @@ public class Cursist {
         updateButton.setOnAction(e -> {
             updateCursist(selectedCursist, nameField.getText(), emailField.getText(),
                     genderChoiceBox.getValue(), dobPicker.getValue(),
-                    addressField.getText(), cityField.getText(), countryField.getText());
+                    addressField.getText(), postCodeField.getText(), cityField.getText(), countryField.getText());
             updateCursistStage.close();
             // Update the TableView
             cursisten.setAll(getCursistenFromDatabase());
@@ -428,13 +470,16 @@ public class Cursist {
         grid.add(dobPicker, 1, 3);
         grid.add(addressLabel, 0, 4);
         grid.add(addressField, 1, 4);
-        grid.add(cityLabel, 0, 5);
-        grid.add(cityField, 1, 5);
-        grid.add(countryLabel, 0, 6);
-        grid.add(countryField, 1, 6);
-        grid.add(updateButton, 1, 7, 2, 1);
+        grid.add(postcodeLabel, 0, 5);
+        grid.add(postCodeField, 1, 5);
+        grid.add(cityLabel, 0, 6);
+        grid.add(cityField, 1, 6);
+        grid.add(countryLabel, 0, 7);
+        grid.add(countryField, 1, 7);
+        grid.add(updateButton, 1, 8, 2, 1);
 
-        populateUpdateForm(selectedCursist, nameField, emailField, genderChoiceBox, dobPicker, addressField, cityField,
+        populateUpdateForm(selectedCursist, nameField, emailField, genderChoiceBox, dobPicker, addressField,
+                postCodeField, cityField,
                 countryField);
 
         VBox vbox = new VBox(10);
@@ -445,7 +490,7 @@ public class Cursist {
     }
 
     private static void populateUpdateForm(Cursist selectedCursist, TextField nameField, TextField emailField,
-            ChoiceBox<String> genderChoiceBox, DatePicker dobPicker, TextField addressField,
+            ChoiceBox<String> genderChoiceBox, DatePicker dobPicker, TextField addressField, TextField postcode,
             TextField cityField, TextField countryField) {
 
         nameField.setText(selectedCursist.getNaam());
@@ -454,20 +499,21 @@ public class Cursist {
         // Assuming Cursist has a method getGeboortedatum() that returns LocalDate
         dobPicker.setValue(selectedCursist.getGeboortedatum().toLocalDate());
         addressField.setText(selectedCursist.getAdres());
+        postcode.setText(selectedCursist.getPostcode());
         cityField.setText(selectedCursist.getWoonplaats());
         countryField.setText(selectedCursist.getLand());
     }
 
     private static void updateCursist(Cursist selectedCursist, String name, String email, String gender,
             LocalDate localDate,
-            String address, String city, String country) {
+            String address, String postcode, String city, String country) {
 
         String url = databaseConnect.getUrl();
         String gebruikersnaam = databaseConnect.getGebruikersnaam();
         String wachtwoord = databaseConnect.GetPass();
 
         // SQL-query om gegevens bij te werken
-        String query = "UPDATE Cursist SET Naam = ?, Email = ?, Geslacht = ?, Geboortedatum = ?, Adres = ?, Woonplaats = ?, Land = ? WHERE email = ?";
+        String query = "UPDATE Cursist SET Naam = ?, Email = ?, Geslacht = ?, Geboortedatum = ?, Adres = ?, postcode = ?, Woonplaats = ?, Land = ? WHERE email = ?";
 
         try {
             // Maak verbinding met de database
@@ -481,9 +527,10 @@ public class Cursist {
             preparedStatement.setString(3, gender);
             preparedStatement.setObject(4, localDate);// Assuming localDate is a LocalDate
             preparedStatement.setString(5, address);
-            preparedStatement.setString(6, city);
-            preparedStatement.setString(7, country);
-            preparedStatement.setString(8, selectedCursist.getEmail());
+            preparedStatement.setString(6, postcode);
+            preparedStatement.setString(7, city);
+            preparedStatement.setString(8, country);
+            preparedStatement.setString(9, selectedCursist.getEmail());
 
             // Voer de update uit
             int rowsAffected = preparedStatement.executeUpdate();
@@ -501,15 +548,16 @@ public class Cursist {
     }
 
     private static void submitCursistForm(String name, String email, String gender, Date dob,
-            String address, String city, String country) {
+            String address, String postcode, String city, String country) {
 
         String url = databaseConnect.getUrl();
         String gebruikersnaam = databaseConnect.getGebruikersnaam();
         String wachtwoord = databaseConnect.GetPass();
 
         // SQL-query om gegevens in te voegen
-        String query = "INSERT INTO Cursist (Naam, Email, Geslacht, Geboortedatum, Adres, Woonplaats, Land) " +
-                "VALUES (?, ?, ?, ?, ?, ?, ?)";
+        String query = "INSERT INTO Cursist (Naam, Email, Geslacht, Geboortedatum, Adres, Postcode, Woonplaats, Land) "
+                +
+                "VALUES (?, ?, ?, ?, ?, ? , ?, ?)";
 
         try {
             // Maak verbinding met de database
@@ -522,8 +570,9 @@ public class Cursist {
             preparedStatement.setString(3, gender);
             preparedStatement.setDate(4, dob);
             preparedStatement.setString(5, address);
-            preparedStatement.setString(6, city);
-            preparedStatement.setString(7, country);
+            preparedStatement.setString(6, postcode);
+            preparedStatement.setString(7, city);
+            preparedStatement.setString(8, country);
 
             // Voer de update uit
             int rowsAffected = preparedStatement.executeUpdate();
