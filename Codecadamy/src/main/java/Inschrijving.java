@@ -1,3 +1,5 @@
+package main.java;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -31,18 +33,18 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TableColumn;
 
 public class Inschrijving {
- 
-    
+
     private static ComboBox<String> cursistComboBox = new ComboBox<>();
     private static ComboBox<String> cursusComboBox = new ComboBox<>();
     private static Map<String, Integer> cursusIdMap = new HashMap<>();
     private static TableView<InschrijvingDetail> inschrijvingenTable;
     private static ObservableList<InschrijvingDetail> data = FXCollections.observableArrayList();
-    
+
     public static void applyStylesheet(Scene scene) {
         String css = Inschrijving.class.getResource("style.css").toExternalForm();
         scene.getStylesheets().add(css);
     }
+
     public static void openInschrijvingenVenster() {
         Stage overzichtStage = new Stage();
         overzichtStage.setTitle("Inschrijvingen Overzicht");
@@ -70,29 +72,29 @@ public class Inschrijving {
         Button addButton = new Button("Maak inschrijving aan");
         addButton.setOnAction(e -> openInschrijvingsFormulier());
 
-       
         Button verwijderKnop = new Button("Verwijder Inschrijving");
         verwijderKnop.setOnAction(e -> {
             deleteSelectedInschrijving();
         });
-        
-         // Add the update button to your VBox layout
+
+        // Add the update button to your VBox layout
         Button updateButton = new Button("Update Inschrijving");
         updateButton.setOnAction(e -> {
             InschrijvingDetail selected = inschrijvingenTable.getSelectionModel().getSelectedItem();
             if (selected != null) {
                 openInschrijvingsUpdateForm(selected);
-            } });
+            }
+        });
         VBox vbox = new VBox(10);
-        vbox.getChildren().addAll(inschrijvingenTable, addButton, verwijderKnop,updateButton);
+        vbox.getChildren().addAll(inschrijvingenTable, addButton, verwijderKnop, updateButton);
         vbox.setPadding(new Insets(10));
-        
+
         Scene scene = new Scene(vbox, 500, 500);
         applyStylesheet(scene);
         overzichtStage.setScene(scene);
         overzichtStage.show();
     }
- 
+
     public static void openInschrijvingsFormulier() {
         Stage inschrijvingsStage = new Stage();
         inschrijvingsStage.setTitle("Inschrijving");
@@ -140,8 +142,7 @@ public class Inschrijving {
         inschrijvingsStage.setScene(scene);
         inschrijvingsStage.show();
     }
-   
-    
+
     private static void vulCursistenComboBox() {
         String url = databaseConnect.getUrl();
         String gebruikersnaam = databaseConnect.getGebruikersnaam();
@@ -264,8 +265,8 @@ public class Inschrijving {
                 int cursusId = resultSet.getInt("CursusID");
                 LocalDate inschrijfDatum = resultSet.getDate("InschrijfDatum").toLocalDate();
 
-                // InschrijvingDetail constructor 
-                
+                // InschrijvingDetail constructor
+
                 InschrijvingDetail inschrijving = new InschrijvingDetail(cursistId, cursusId, inschrijfDatum);
                 inschrijvingen.add(inschrijving);
                 inschrijvingenTable.refresh();
@@ -278,134 +279,127 @@ public class Inschrijving {
         return inschrijvingen;
     }
 
-private static void deleteSelectedInschrijving() {
-    InschrijvingDetail selectedInschrijving = inschrijvingenTable.getSelectionModel().getSelectedItem();
+    private static void deleteSelectedInschrijving() {
+        InschrijvingDetail selectedInschrijving = inschrijvingenTable.getSelectionModel().getSelectedItem();
 
-    if (selectedInschrijving != null) {
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setTitle("Bevestig Verwijdering");
-        alert.setHeaderText("Weet je zeker dat je de inschrijving wilt verwijderen?");
-        alert.setContentText("Geselecteerde inschrijving: " + selectedInschrijving);
+        if (selectedInschrijving != null) {
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+            alert.setTitle("Bevestig Verwijdering");
+            alert.setHeaderText("Weet je zeker dat je de inschrijving wilt verwijderen?");
+            alert.setContentText("Geselecteerde inschrijving: " + selectedInschrijving);
 
-        Optional<ButtonType> result = alert.showAndWait();
-        if (result.isPresent() && result.get() == ButtonType.OK) {
-            deleteInschrijvingFromDatabase(selectedInschrijving);
+            Optional<ButtonType> result = alert.showAndWait();
+            if (result.isPresent() && result.get() == ButtonType.OK) {
+                deleteInschrijvingFromDatabase(selectedInschrijving);
 
-            data.setAll(haalInschrijvingenOp());
-        }
-    } else {
-        Alert alert = new Alert(Alert.AlertType.WARNING);
-        alert.setTitle("Geen Inschrijving Geselecteerd");
-        alert.setHeaderText(null);
-        alert.setContentText("Selecteer eerst een inschrijving om te verwijderen.");
-        alert.showAndWait();
-    }
-}
-
-    
-private static void deleteInschrijvingFromDatabase(InschrijvingDetail selectedInschrijving) {
-    String url = databaseConnect.getUrl();
-    String gebruikersnaam = databaseConnect.getGebruikersnaam();
-    String wachtwoord = databaseConnect.GetPass();
-
-    String query = "DELETE FROM Inschrijving WHERE CursistEmail = ? AND CursusID = ? AND InschrijfDatum = ?";
-
-    try (Connection connection = DriverManager.getConnection(url, gebruikersnaam, wachtwoord);
-         PreparedStatement preparedStatement = connection.prepareStatement(query)) {
-
-        preparedStatement.setString(1, selectedInschrijving.getCursistEmail());
-        preparedStatement.setInt(2, selectedInschrijving.getCursusId());
-        preparedStatement.setDate(3, java.sql.Date.valueOf(selectedInschrijving.getInschrijfDatum()));
-
-        int rowsAffected = preparedStatement.executeUpdate();
-        if (rowsAffected > 0) {
-            System.out.println("Inschrijving succesvol verwijderd uit de database.");
+                data.setAll(haalInschrijvingenOp());
+            }
         } else {
-            System.out.println("Geen inschrijving gevonden om te verwijderen.");
-        }
-    } catch (SQLException e) {
-        System.out.println("SQL Fout: " + e.getMessage());
-        e.printStackTrace();
-    }
-}
-
-
-    
-    
-
-   
-
-// Method to open the update form
-public static void openInschrijvingsUpdateForm(InschrijvingDetail detail) {
-    Stage updateStage = new Stage();
-    updateStage.setTitle("Update Inschrijving");
-
-    GridPane grid = new GridPane();
-    grid.setPadding(new Insets(10, 10, 10, 10));
-    grid.setAlignment(Pos.CENTER);
-    grid.setVgap(10);
-    grid.setHgap(10);
-
-    Label cursistLabel = new Label("Cursist:");
-    cursistComboBox.setPromptText("Selecteer een cursist");
-    cursistComboBox.setValue(detail.getCursistEmail()); // Pre-fill 
-
-    Label cursusLabel = new Label("Cursus:");
-    cursusComboBox.setPromptText("Selecteer een cursus");
-    cursusComboBox.setValue(getCursusNaamFromId(detail.getCursusId())); // Pre-fill 
-
-    Label datumLabel = new Label("Datum:");
-    DatePicker datePicker = new DatePicker();
-    datePicker.setValue(detail.getInschrijfDatum()); // Pre-fill 
-
-    Button updateButton = new Button("Update");
-    updateButton.setOnAction(e -> {
-        String selectedCursistEmail = cursistComboBox.getValue();
-        String selectedCursusNaam = cursusComboBox.getValue();
-        LocalDate inschrijfDatum = datePicker.getValue();
-        if (selectedCursistEmail != null && selectedCursusNaam != null && inschrijfDatum != null) {
-            int selectedCursusId = cursusIdMap.get(selectedCursusNaam);
-            updateInschrijving(selectedCursistEmail, selectedCursusId, inschrijfDatum);
-            updateStage.close();
-        }
-    });
-
-    grid.add(cursistLabel, 0, 0);
-    grid.add(cursistComboBox, 1, 0);
-    grid.add(cursusLabel, 0, 1);
-    grid.add(cursusComboBox, 1, 1);
-    grid.add(datumLabel, 0, 2);
-    grid.add(datePicker, 1, 2);
-    grid.add(updateButton, 1, 3);
-
-    Scene scene = new Scene(grid, 300, 275);
-    applyStylesheet(scene);
-    updateStage.setScene(scene);
-    updateStage.show();
-}
-
-private static String getCursusNaamFromId(int cursusId) {
-    for (Map.Entry<String, Integer> entry : cursusIdMap.entrySet()) {
-        if (entry.getValue().equals(cursusId)) {
-            return entry.getKey();
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("Geen Inschrijving Geselecteerd");
+            alert.setHeaderText(null);
+            alert.setContentText("Selecteer eerst een inschrijving om te verwijderen.");
+            alert.showAndWait();
         }
     }
-    return null; 
-}
+
+    private static void deleteInschrijvingFromDatabase(InschrijvingDetail selectedInschrijving) {
+        String url = databaseConnect.getUrl();
+        String gebruikersnaam = databaseConnect.getGebruikersnaam();
+        String wachtwoord = databaseConnect.GetPass();
+
+        String query = "DELETE FROM Inschrijving WHERE CursistEmail = ? AND CursusID = ? AND InschrijfDatum = ?";
+
+        try (Connection connection = DriverManager.getConnection(url, gebruikersnaam, wachtwoord);
+                PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+
+            preparedStatement.setString(1, selectedInschrijving.getCursistEmail());
+            preparedStatement.setInt(2, selectedInschrijving.getCursusId());
+            preparedStatement.setDate(3, java.sql.Date.valueOf(selectedInschrijving.getInschrijfDatum()));
+
+            int rowsAffected = preparedStatement.executeUpdate();
+            if (rowsAffected > 0) {
+                System.out.println("Inschrijving succesvol verwijderd uit de database.");
+            } else {
+                System.out.println("Geen inschrijving gevonden om te verwijderen.");
+            }
+        } catch (SQLException e) {
+            System.out.println("SQL Fout: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    // Method to open the update form
+    public static void openInschrijvingsUpdateForm(InschrijvingDetail detail) {
+        Stage updateStage = new Stage();
+        updateStage.setTitle("Update Inschrijving");
+
+        GridPane grid = new GridPane();
+        grid.setPadding(new Insets(10, 10, 10, 10));
+        grid.setAlignment(Pos.CENTER);
+        grid.setVgap(10);
+        grid.setHgap(10);
+
+        Label cursistLabel = new Label("Cursist:");
+        cursistComboBox.setPromptText("Selecteer een cursist");
+        cursistComboBox.setValue(detail.getCursistEmail()); // Pre-fill
+
+        Label cursusLabel = new Label("Cursus:");
+        cursusComboBox.setPromptText("Selecteer een cursus");
+        cursusComboBox.setValue(getCursusNaamFromId(detail.getCursusId())); // Pre-fill
+
+        Label datumLabel = new Label("Datum:");
+        DatePicker datePicker = new DatePicker();
+        datePicker.setValue(detail.getInschrijfDatum()); // Pre-fill
+
+        Button updateButton = new Button("Update");
+        updateButton.setOnAction(e -> {
+            String selectedCursistEmail = cursistComboBox.getValue();
+            String selectedCursusNaam = cursusComboBox.getValue();
+            LocalDate inschrijfDatum = datePicker.getValue();
+            if (selectedCursistEmail != null && selectedCursusNaam != null && inschrijfDatum != null) {
+                int selectedCursusId = cursusIdMap.get(selectedCursusNaam);
+                updateInschrijving(selectedCursistEmail, selectedCursusId, inschrijfDatum);
+                updateStage.close();
+            }
+        });
+
+        grid.add(cursistLabel, 0, 0);
+        grid.add(cursistComboBox, 1, 0);
+        grid.add(cursusLabel, 0, 1);
+        grid.add(cursusComboBox, 1, 1);
+        grid.add(datumLabel, 0, 2);
+        grid.add(datePicker, 1, 2);
+        grid.add(updateButton, 1, 3);
+
+        Scene scene = new Scene(grid, 300, 275);
+        applyStylesheet(scene);
+        updateStage.setScene(scene);
+        updateStage.show();
+    }
+
+    private static String getCursusNaamFromId(int cursusId) {
+        for (Map.Entry<String, Integer> entry : cursusIdMap.entrySet()) {
+            if (entry.getValue().equals(cursusId)) {
+                return entry.getKey();
+            }
+        }
+        return null;
+    }
 
     public static void updateInschrijving(String cursistEmail, int cursusId, LocalDate inschrijfDatum) {
         String url = databaseConnect.getUrl();
         String gebruikersnaam = databaseConnect.getGebruikersnaam();
         String wachtwoord = databaseConnect.GetPass();
-    
+
         try (Connection connection = DriverManager.getConnection(url, gebruikersnaam, wachtwoord)) {
             String query = "UPDATE Inschrijving SET CursusID = ?, InschrijfDatum = ? WHERE CursistEmail = ?";
-    
+
             try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
                 preparedStatement.setInt(1, cursusId);
                 preparedStatement.setDate(2, java.sql.Date.valueOf(inschrijfDatum));
                 preparedStatement.setString(3, cursistEmail);
-    
+
                 int affectedRows = preparedStatement.executeUpdate();
                 if (affectedRows > 0) {
                     System.out.println("Inschrijving is succesvol bijgewerkt voor cursist: " + cursistEmail);
@@ -418,6 +412,5 @@ private static String getCursusNaamFromId(int cursusId) {
             e.printStackTrace();
         }
     }
-    
 
 }

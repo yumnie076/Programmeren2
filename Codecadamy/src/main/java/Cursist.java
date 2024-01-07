@@ -1,3 +1,5 @@
+package main.java;
+
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.DriverManager;
@@ -374,32 +376,23 @@ public class Cursist {
         alert.showAndWait();
     }
 
-    private static boolean isValidEmail(String email) {
+    public static boolean isValidEmail(String email) {
         return email.matches("^[a-zA-Z0-9_]+@[a-zA-Z0-9]+\\.[a-zA-Z]{2,}$");
     }
 
-    private static String formatPostcode(String postcode) {
-        String postalCodePattern = "^[1-9]\\d{3}\\s[A-Z]{2}$";
+    public static String formatPostcode(String postcode) {
+        // Verwijder alle non-alphanumeric characters uit de postcode
+        String alphanumericString = postcode.replaceAll("[^a-zA-Z0-9]", "");
 
-        // Compile the pattern
-        Pattern pattern = Pattern.compile(postalCodePattern);
-
-        // Create a matcher for the entered postal code
-        Matcher matcher = pattern.matcher(postcode);
-
-        // Check if the entered postal code matches the pattern
-        if (matcher.matches()) {
-            // The postal code is valid, no further action needed
-            return postcode;
-        } else {
-            // The entered postal code does not match the expected format, attempt to format
-            // Remove any non-numeric characters
-            String numericDigits = postcode.replaceAll("\\D", "");
-
-            // Format the numeric digits and add the space and uppercase letters
-            String formattedPostalCode = numericDigits.substring(0, 4) + " " + numericDigits.substring(4, 6);
-
+        // Controleer of het alfanumerieke deel de verwachte lengte heeft (4 cijfers + 2
+        // letters)
+        if (alphanumericString.length() == 6) {
+            // Formatteer als 4 cijfers gevolgd door 2 letters
+            String formattedPostalCode = alphanumericString.substring(0, 4) + " " + alphanumericString.substring(4);
             return formattedPostalCode;
+        } else {
+            // Geef een foutmelding terug als de lengte niet overeenkomt
+            throw new IllegalArgumentException("Ongeldige postcode: " + postcode);
         }
     }
 

@@ -1,3 +1,5 @@
+package main.java;
+
 public class databaseConnect {
     static String url = "jdbc:sqlserver://localhost;databaseName=CodeAcadamyGroup;encrypt=true;trustServerCertificate=true;";
     static String gebruikersnaam = "salim";
