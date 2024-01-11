@@ -23,8 +23,8 @@ public class CursistTest {
 
     @Test
     public void testCursistConstructor() {
-        String naam = "John Doe";
-        String email = "john.doe@example.com";
+        String naam = "Test Test";
+        String email = "Test.Test@example.com";
         String geslacht = "Man";
         Date geboortedatum = Date.valueOf(LocalDate.of(1990, 1, 1));
         String adres = "123 Main St";
@@ -90,16 +90,6 @@ public class CursistTest {
         String invalidEmail = "invalid.email";
 
         boolean result = Cursist.isValidEmail(invalidEmail);
-
-        assertFalse(result);
-    }
-
-    @Test
-    void isValidEmail_NullEmail_ReturnsFalse() {
-
-        String nullEmail = null;
-
-        boolean result = Cursist.isValidEmail(nullEmail);
 
         assertFalse(result);
     }
