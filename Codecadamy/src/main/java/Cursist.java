@@ -92,6 +92,11 @@ public class Cursist {
         return land;
     }
 
+    public static void applyStylesheet(Scene scene) {
+        String css = Inschrijving.class.getResource("style.css").toExternalForm();
+        scene.getStylesheets().add(css);
+    }
+
     public static void openCursistVenster() {
         cursistenTableView.getColumns().clear();
         if (cursistenTableView.getColumns().isEmpty()) {
@@ -110,31 +115,34 @@ public class Cursist {
 
             // Maak een VBox voor het opmaken van de knoppen en de lijst met cursisten
             VBox vbox = new VBox(10); // 10 is de verticale ruimte tussen knoppen en lijst
-            vbox.setPadding(new Insets(10, 10, 10, 10));
-            vbox.setAlignment(javafx.geometry.Pos.CENTER); // Knoppen en lijst in het midden van de pagina
+            vbox.setPadding(new Insets(10));
 
             // Voeg knoppen toe aan de VBox
             Button addButton = new Button("Voeg Cursist Toe");
             addButton.setOnAction(e -> CreateCursist());
 
-            Button deleteButton = new Button("Verwijder Geselecteerde Cursist");
+            Button deleteButton = new Button("Verwijder Cursist");
             deleteButton.setOnAction(e -> deleteSelectedCursist());
 
-            Button updateButton = new Button("Update Geselecteerde Cursist");
+            Button updateButton = new Button("Update Cursist");
             updateButton.setOnAction(e -> updateSelectedCursist());
 
             // Voeg lijst met cursisten toe
             TableColumn<Cursist, String> naamColumn = new TableColumn<>("Naam");
             naamColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getNaam()));
+            naamColumn.setMinWidth(150);
 
             TableColumn<Cursist, String> emailColumn = new TableColumn<>("Email");
             emailColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getEmail()));
+            emailColumn.setMinWidth(150);
 
             TableColumn<Cursist, String> geslachtColumn = new TableColumn<>("Geslacht");
             geslachtColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getGeslacht()));
+            geslachtColumn.setMinWidth(100);
 
             TableColumn<Cursist, String> woonpTableColumn = new TableColumn<>("Woonplaats");
             woonpTableColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getWoonplaats()));
+            woonpTableColumn.setMinWidth(150);
 
             cursistenTableView.getColumns()
                     .addAll(Arrays.asList(naamColumn, emailColumn, geslachtColumn, woonpTableColumn));
@@ -147,7 +155,8 @@ public class Cursist {
             vbox.getChildren().addAll(titleBox, cursistenTableView, addButton, deleteButton, updateButton);
 
             // Maak een Scene en toon het venster
-            Scene scene = new Scene(vbox, 500, 500);
+            Scene scene = new Scene(vbox, 600, 550);
+            applyStylesheet(scene);
             cursistStage.setScene(scene);
             cursistStage.show();
         }
@@ -344,6 +353,8 @@ public class Cursist {
 
         // Maak een Scene en toon het venster
         Scene scene = new Scene(grid, 500, 400);
+        applyStylesheet(scene);
+
         createCursistStage.setScene(scene);
         createCursistStage.show();
     }
@@ -483,6 +494,7 @@ public class Cursist {
         VBox vbox = new VBox(10);
         vbox.getChildren().addAll(titleBox, grid, updateButton);
         Scene scene = new Scene(vbox, 300, 400);
+        applyStylesheet(scene);
         updateCursistStage.setScene(scene);
         updateCursistStage.show();
     }

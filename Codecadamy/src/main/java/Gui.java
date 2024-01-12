@@ -14,18 +14,17 @@ import javafx.stage.Stage;
 public class Gui extends Application {
 
     @Override
-
     public void start(Stage primaryStage) {
-        primaryStage.setTitle("Homepagina");
+        primaryStage.setTitle("Homepage");
 
-        // Titel bovenaan de pagina
-        Text title = new Text("Welkom op de Homepagina");
+        // Title at the top of the page
+        Text title = new Text("Welcome to the Homepage");
         title.setFont(Font.font("Verdana", FontWeight.BOLD, 30));
 
-        Text titleTwo = new Text("Salim Fenzar(2211259), Yumnie Taouil()");
+        Text titleTwo = new Text("Salim Fenzar(2211259), Yumnie Taouil(2211614)");
         titleTwo.setFont(Font.font("Verdana", FontWeight.MEDIUM, 20));
 
-        // Maak een HBox voor het opmaken van de titel
+        // Create an HBox for formatting the title
         HBox titleBox = new HBox();
         titleBox.getChildren().add(title);
         titleBox.setAlignment(javafx.geometry.Pos.TOP_CENTER);
@@ -36,28 +35,28 @@ public class Gui extends Application {
         titleTwoBox.setAlignment(javafx.geometry.Pos.BOTTOM_CENTER);
         titleTwoBox.setPadding(new Insets(10, 10, 10, 10));
 
-        // Maak een HBox voor het opmaken van de knoppen
-        HBox buttonBox = new HBox(10); // 10 is de horizontale ruimte tussen knoppen
+        // Create an HBox for formatting the buttons
+        HBox buttonBox = new HBox(10); // 10 is the horizontal spacing between buttons
         buttonBox.setPadding(new Insets(10, 10, 10, 10));
-        buttonBox.setAlignment(javafx.geometry.Pos.BOTTOM_CENTER); // Knoppen aan de onderkant en gecentreerd
+        buttonBox.setAlignment(javafx.geometry.Pos.BOTTOM_CENTER); // Buttons at the bottom and centered
 
-        // Voeg knoppen toe aan de HBox
+        // Add buttons to the HBox
         Button buttonCursist = new Button("Cursist");
         Button buttonOverview = new Button("Overview pages");
         Button buttonInschrijving = new Button("Inschrijving");
 
-        // Voeg knopfunctionaliteit toe
+        // Add button functionality
         buttonCursist.setOnAction(e -> Cursist.openCursistVenster());
         buttonOverview.setOnAction(e -> Overview.openOverviewPage());
         buttonInschrijving.setOnAction(e -> Inschrijving.openInschrijvingenVenster());
 
         buttonBox.getChildren().addAll(buttonCursist, buttonOverview, buttonInschrijving);
 
-        // Maak een VBox voor het opmaken van de gehele pagina
-        VBox vbox = new VBox(10); // 10 is de verticale ruimte tussen titel en knoppen
+        // Create a VBox for formatting the entire page
+        VBox vbox = new VBox(10); // 10 is the vertical spacing between title and buttons
         vbox.getChildren().addAll(titleBox, titleTwoBox, buttonBox);
 
-        // Maak een Scene en toon het venster
+        // Create a Scene and display the window
         Scene scene = new Scene(vbox, 700, 700);
         scene.getStylesheets().add(getClass().getResource("style.css").toExternalForm());
         primaryStage.setScene(scene);

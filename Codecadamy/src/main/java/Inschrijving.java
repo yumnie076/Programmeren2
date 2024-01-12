@@ -25,7 +25,11 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.scene.control.Label;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -48,6 +52,15 @@ public class Inschrijving {
     public static void openInschrijvingenVenster() {
         Stage overzichtStage = new Stage();
         overzichtStage.setTitle("Inschrijvingen Overzicht");
+
+        Text title = new Text("Inschrijvingen Overzicht");
+        title.setFont(Font.font("Verdana", FontWeight.BOLD, 14));
+
+        // Maak een HBox voor het opmaken van de titel
+        HBox titleBox = new HBox();
+        titleBox.getChildren().add(title);
+        titleBox.setAlignment(javafx.geometry.Pos.TOP_CENTER);
+        titleBox.setPadding(new Insets(10, 10, 10, 10));
 
         // Tabel voor inschrijvingen
         inschrijvingenTable = new TableView<>();
@@ -86,10 +99,10 @@ public class Inschrijving {
             }
         });
         VBox vbox = new VBox(10);
-        vbox.getChildren().addAll(inschrijvingenTable, addButton, verwijderKnop, updateButton);
+        vbox.getChildren().addAll(titleBox, inschrijvingenTable, addButton, verwijderKnop, updateButton);
         vbox.setPadding(new Insets(10));
 
-        Scene scene = new Scene(vbox, 500, 500);
+        Scene scene = new Scene(vbox, 600, 550);
         applyStylesheet(scene);
         overzichtStage.setScene(scene);
         overzichtStage.show();
@@ -137,7 +150,7 @@ public class Inschrijving {
         vulCursistenComboBox();
         vulCursusComboBox();
 
-        Scene scene = new Scene(grid, 300, 275);
+        Scene scene = new Scene(grid, 500, 500);
         applyStylesheet(scene);
         inschrijvingsStage.setScene(scene);
         inschrijvingsStage.show();
